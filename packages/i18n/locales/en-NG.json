@@ -1,0 +1,15 @@
+{
+  "app.name": "NaWeAgree",
+  "app.tagline": "So you both remember the same thing",
+  "cta.getStarted": "Start a plan",
+  "cta.seeFullPlan": "See full plan",
+  "cta.agreeVersion": "I have seen and I agree with {version}",
+  "cta.askQuestion": "Ask a question",
+  "cta.needTime": "I need more time",
+  "cta.disagree": "I see it differently",
+  "status.draft": "Only you can see this",
+  "status.mutual": "You both reviewed {version}",
+  "error.notFound": "We couldn't find that plan.",
+  "error.generic": "Something went wrong — we logged it. Try again.",
+  "legal.notContract": "This is a shared record, not a legal contract."
+}

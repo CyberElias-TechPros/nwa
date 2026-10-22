@@ -1,0 +1,18 @@
+{
+  "name": "@nwa/design-tokens",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tokens.json": "./tokens.json",
+    "./dist/tokens.css": "./dist/tokens.css",
+    "./dist/Colors.kt": "./dist/Colors.kt"
+  },
+  "scripts": {
+    "build": "node scripts/build.js",
+    "typecheck": "echo 'design-tokens: no ts sources'",
+    "lint": "node scripts/check-contrast.js",
+    "test": "node scripts/build.js"
+  },
+  "devDependencies": {}
+}
