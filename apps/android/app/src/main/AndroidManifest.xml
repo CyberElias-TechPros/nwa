@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Camera/storage/POST_NOTIFICATIONS requested at runtime in W13/W20 when features land. -->
+
+    <application
+        android:name=".NwaApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.NaWeAgree">
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.NaWeAgree">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <!-- App Links: https://naweagree.app/j/<token> -->
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="naweagree.app" android:pathPrefix="/j/" />
+                <data android:scheme="https" android:host="naweagree.com" android:pathPrefix="/j/" />
+                <data android:scheme="https" android:host="www.naweagree.app" android:pathPrefix="/j/" />
+                <data android:scheme="https" android:host="www.naweagree.com" android:pathPrefix="/j/" />
+            </intent-filter>
+            <!-- Dev/staging preview hosts (Vercel) — non-autoVerify so they don't need assetlinks. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="naweagree.vercel.app" android:pathPrefix="/j/" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

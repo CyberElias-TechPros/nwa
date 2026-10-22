@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+# Invite links are unlisted — don't index them; they contain bearer tokens.
+Disallow: /j/

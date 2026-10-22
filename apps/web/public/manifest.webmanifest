@@ -1,0 +1,21 @@
+{
+  "name": "NaWeAgree",
+  "short_name": "NaWeAgree",
+  "description": "Shared plans for custom work — so you both remember the same thing.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F5F7FB",
+  "theme_color": "#155EEF",
+  "lang": "en-NG",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

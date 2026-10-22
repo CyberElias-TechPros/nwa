@@ -1,0 +1,15 @@
+{
+  "app.name": "NaWeAgree",
+  "app.tagline": "Make una both remember the same thing",
+  "cta.getStarted": "Start plan",
+  "cta.seeFullPlan": "See the full plan",
+  "cta.agreeVersion": "I see am, I agree with {version}",
+  "cta.askQuestion": "Ask question",
+  "cta.needTime": "I need more time",
+  "cta.disagree": "I see am differently",
+  "status.draft": "Only you dey see am",
+  "status.mutual": "Una don review {version}",
+  "error.notFound": "We no see that plan.",
+  "error.generic": "Something spoil — we don write am. Try again.",
+  "legal.notContract": "This na shared record, e no be contract."
+}

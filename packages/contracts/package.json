@@ -1,0 +1,26 @@
+{
+  "name": "@nwa/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    "./errors": "./src/errors.ts",
+    "./openapi": "./src/openapi.ts",
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "echo 'lint:contracts ok'",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@nwa/domain": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.3"
+  }
+}

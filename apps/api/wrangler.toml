@@ -1,0 +1,20 @@
+name = "nwa-api"
+compatibility_date = "2025-07-18"
+compatibility_flags = ["nodejs_compat"]
+main = "src/index.ts"
+
+# W4 reminders: daily sweep at 09:00 UTC. Cron fires GET / against the worker
+# — we mount a scheduled() handler in src/index.ts via the Hono /_scheduler/sweep
+# route to do the real work. Queues (W4b) go in [queues] below when we wire
+# push/email delivery.
+[triggers]
+crons = ["0 9 * * *"]
+
+[env.dev]
+name = "nwa-api-dev"
+
+[env.staging]
+name = "nwa-api-staging"
+
+[env.prod]
+name = "nwa-api-prod"

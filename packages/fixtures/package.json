@@ -1,0 +1,23 @@
+{
+  "name": "@nwa/fixtures",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./clock": "./src/clock.ts",
+    "./scenarios": "./src/scenarios.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "echo 'lint:fixtures ok'",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@nwa/domain": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.3"
+  }
+}
