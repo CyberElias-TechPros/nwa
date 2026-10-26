@@ -1,0 +1,38 @@
+{
+  "name": "@nwa/web",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "next lint",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:e2e": "echo 'playwright e2e wired in W9'"
+  },
+  "dependencies": {
+    "@nwa/contracts": "workspace:*",
+    "@nwa/design-tokens": "workspace:*",
+    "@nwa/domain": "workspace:*",
+    "@nwa/i18n": "workspace:*",
+    "next": "15.0.3",
+    "react": "19.0.0-rc-66855b96-20241106",
+    "react-dom": "19.0.0-rc-66855b96-20241106",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@next/eslint-plugin-next": "15.0.3",
+    "@testing-library/jest-dom": "^6.6.2",
+    "@testing-library/react": "^16.0.1",
+    "@types/node": "^22.7.5",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.3",
+    "eslint": "^9.13.0",
+    "eslint-config-next": "15.0.3",
+    "jsdom": "^25.0.1",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.3"
+  }
+}

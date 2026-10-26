@@ -1,0 +1,28 @@
+{
+  "name": "@nwa/admin",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001",
+    "lint": "next lint",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "echo 'admin tests added W16'"
+  },
+  "dependencies": {
+    "@nwa/contracts": "workspace:*",
+    "@nwa/domain": "workspace:*",
+    "next": "15.0.3",
+    "react": "19.0.0-rc-66855b96-20241106",
+    "react-dom": "19.0.0-rc-66855b96-20241106"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint": "^9.13.0",
+    "eslint-config-next": "15.0.3",
+    "typescript": "^5.6.3"
+  }
+}

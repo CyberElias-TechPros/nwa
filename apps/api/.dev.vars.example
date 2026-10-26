@@ -1,0 +1,12 @@
+# Copy this to .dev.vars and fill in real values for local dev.
+# .dev.vars is git-ignored; never commit secrets.
+#
+# If DATABASE_URL is unset, the API boots in "memory mode" using the existing
+# in-memory store (data is lost on each wrangler restart). When it is set,
+# the API uses Neon Postgres via Kysely.
+DATABASE_URL=
+RECEIPT_SECRET=dev-receipt-secret-change-me
+SCHEDULER_SECRET=dev-scheduler-secret-change-me
+EMAIL_API_KEY=
+VAPID_PUBLIC_KEY=
+VAPID_PRIVATE_KEY=
