@@ -1,0 +1,25 @@
+{
+  "name": "NaWeAgree — shared plans",
+  "short_name": "NaWeAgree",
+  "description": "Turn verbal agreements into shared plans. No more 'I thought you said'.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF7F2",
+  "theme_color": "#C2410C",
+  "lang": "en-NG",
+  "categories": ["productivity", "utilities", "business"],
+  "shortcuts": [
+    { "name": "Start a plan", "short_name": "New plan", "url": "/new", "description": "Create a new shared plan" },
+    { "name": "My plans", "short_name": "Plans", "url": "/plans", "description": "Plans you've started or opened on this device" }
+  ],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

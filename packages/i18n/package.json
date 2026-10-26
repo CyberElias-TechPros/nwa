@@ -1,0 +1,17 @@
+{
+  "name": "@nwa/i18n",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./locales/en-NG.json": "./locales/en-NG.json",
+    "./locales/pcm.json": "./locales/pcm.json"
+  },
+  "scripts": {
+    "build": "node scripts/validate.js",
+    "typecheck": "echo 'i18n: no ts sources'",
+    "lint": "echo 'lint:i18n ok'",
+    "test": "node scripts/validate.js"
+  },
+  "devDependencies": {}
+}

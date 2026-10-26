@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /j/
+Disallow: /plans
+
+Sitemap: https://naweagree.app/sitemap.xml
