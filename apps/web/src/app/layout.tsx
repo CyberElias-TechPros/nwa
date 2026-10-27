@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Nav } from '@/components/nav';
 import { Footer } from '@/components/footer';
+import { OutboxBanner } from '@/components/outbox-banner';
 import ServiceWorkerRegister from '@/components/sw-register';
 import './globals.css';
 
@@ -65,8 +66,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&display=swap" />
       </head>
       <body>
+        <a href="#main" className="skip-link">Skip to main content</a>
         <Nav />
-        {children}
+        <OutboxBanner />
+        <div id="main">{children}</div>
         <Footer />
         <ServiceWorkerRegister />
       </body>

@@ -61,6 +61,37 @@ a {
 a:hover { color: var(--nwa-color-primary); text-decoration-color: currentColor; }
 ul, ol { padding-left: 1.25rem; margin: 0 0 var(--nwa-space-3); }
 
+/* Typography utility classes */
+.display-title {
+  font-family: var(--nwa-font-display);
+  font-weight: 700;
+  font-size: clamp(2.2rem, 5vw + 1rem, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--nwa-color-ink);
+}
+.eyebrow {
+  display: inline-block;
+  font-size: var(--nwa-type-caption-size);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--nwa-color-primary);
+  margin-bottom: var(--nwa-space-2);
+}
+.lead {
+  font-size: var(--nwa-type-bodyLg-size, 1.125rem);
+  line-height: 1.55;
+  color: var(--nwa-color-text-muted);
+}
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.92em;
+  background: var(--nwa-color-surfaceMuted, #f5f1ea);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
 /* --- Layout helpers --- */
 main {
   max-width: 48rem;
@@ -131,9 +162,12 @@ main.wide { max-width: 72rem; }
   box-shadow: none;
   border-color: var(--nwa-color-border);
 }
+.btn.primary, .btn.btn-primary { --btn-bg: var(--nwa-color-primary); --btn-bg-hover: var(--nwa-color-primaryHover); }
 .btn.teal { --btn-bg: var(--nwa-color-teal); --btn-bg-hover: var(--nwa-color-teal); filter: brightness(1.08); }
 .btn.gold { --btn-bg: var(--nwa-color-gold); --btn-bg-hover: var(--nwa-color-gold); }
+.btn.danger { --btn-bg: var(--nwa-color-danger, #b91c1c); --btn-bg-hover: var(--nwa-color-danger, #b91c1c); filter: brightness(1.08); }
 .btn.sm { padding: 8px 14px; font-size: var(--nwa-type-caption-size); min-height: 36px; }
+.btn.link { --btn-bg: transparent; --btn-bg-hover: transparent; --btn-fg: var(--nwa-color-teal); box-shadow: none; padding: 8px 4px; text-decoration: underline; min-height: auto; }
 
 /* --- Badge --- */
 .badge {
@@ -150,6 +184,14 @@ main.wide { max-width: 72rem; }
 }
 .badge.teal { background: var(--nwa-color-teal); }
 .badge.gold { background: var(--nwa-color-gold); color: #1C140D; }
+.badge.success { background: var(--nwa-color-success, #15803D); }
+.badge.warning { background: var(--nwa-color-warning, #B45309); }
+.badge.danger { background: var(--nwa-color-danger, #B91C1C); }
+/* Neutral badge — used alongside role labels. */
+.badge:not(.teal):not(.gold):not(.success):not(.warning):not(.danger):not(.soft) {
+  background: var(--nwa-color-surfaceMuted);
+  color: var(--nwa-color-text);
+}
 .badge.soft {
   background: var(--nwa-color-primarySoft);
   color: var(--nwa-color-primary);
@@ -178,6 +220,30 @@ input:focus, select:focus, textarea:focus {
 input::placeholder, textarea::placeholder { color: var(--nwa-color-text-muted); }
 
 /* --- Nav --- */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--nwa-color-ink);
+  color: #fff;
+  padding: 10px 16px;
+  z-index: 100;
+  border-radius: 0 0 8px 0;
+}
+.skip-link:focus { left: 0; }
+
+.offline-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px var(--nwa-space-4);
+  font-weight: 500;
+  font-size: var(--nwa-type-bodySm-size);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
 nav.topnav {
   position: sticky;
   top: 0;

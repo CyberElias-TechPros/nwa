@@ -76,19 +76,25 @@ export default function PlansPage() {
   }, []);
 
   if (error) {
-    return <main><h1>Your plans</h1><p className="muted" style={{ color: '#b91c1c' }}>Could not load plans: {error}</p></main>;
+    return (
+      <main>
+        <h1>Your plans</h1>
+        <div role="alert" className="card danger">
+          <p style={{ margin: 0 }}>Could not load plans: {error}</p>
+        </div>
+      </main>
+    );
   }
   if (!rows) return <main><p className="muted">Loading…</p></main>;
 
   if (rows.length === 0) {
     return (
       <main>
-        <h1>Your plans</h1>
-        <p className="muted">You haven't started or opened any plans yet.</p>
+        <p className="eyebrow">Dashboard</p>
+        <h1 className="display-title" style={{ marginBottom: 'var(--space-3)' }}>Your plans</h1>
+        <p className="lead" style={{ marginBottom: 'var(--space-5)' }}>You haven't started or opened any plans yet.</p>
         <p>
-          <Link href="/new" className="btn" style={{ display: 'inline-block', textDecoration: 'none', padding: '12px 20px' }}>
-            Start your first plan
-          </Link>
+          <Link href="/new" className="btn btn-primary">Start your first plan</Link>
         </p>
       </main>
     );
@@ -96,15 +102,15 @@ export default function PlansPage() {
 
   return (
     <main>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8, gap: 12, flexWrap: 'wrap' }}>
         <h1 style={{ marginBottom: 4 }}>Your plans</h1>
-        <Link href="/new" className="btn" style={{ padding: '10px 16px', fontSize: 14, textDecoration: 'none', display: 'inline-block' }}>+ New plan</Link>
+        <Link href="/new" className="btn btn-primary sm">+ New plan</Link>
       </div>
-      <p className="muted" style={{ marginTop: 0 }}>Plans tied to this device — both plans you started and plans you've opened.</p>
+      <p className="muted" style={{ marginTop: 0, marginBottom: 'var(--space-5)' }}>Plans tied to this device — both plans you started and plans you've opened.</p>
 
-      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 'var(--space-3)' }}>
         {rows.map((r) => (
-          <li key={`${r.kind}-${r.job.id}`} className="card">
+          <li key={`${r.kind}-${r.job.id}`}>
             <PlanRow row={r} />
           </li>
         ))}
@@ -116,30 +122,34 @@ export default function PlansPage() {
 function PlanRow({ row }: { row: Row }) {
   const title = row.job.title || 'Untitled plan';
   const roleLabel = row.kind === 'created' ? 'You started this' : `You opened as ${row.displayName}`;
-  const status = statusLabel(row.job.status);
+  const { label: statusLabel, tone } = statusMeta(row.job.status);
   const href = row.token ? `/j/${row.token}` : '/plans';
   return (
-    <Link href={href as any} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
+    <Link href={href as any} className="card" style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start' }}>
-        <div>
-          <h3 style={{ margin: '0 0 4px' }}>{title}</h3>
-          <div className="muted" style={{ fontSize: 13 }}>{roleLabel} · {status}</div>
+        <div style={{ minWidth: 0 }}>
+          <h3 style={{ margin: '0 0 6px', fontSize: '1.05rem' }}>{title}</h3>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            <span className={`badge ${tone}`}>{statusLabel}</span>
+            <span className="muted" style={{ fontSize: 13 }}>{roleLabel}</span>
+          </div>
         </div>
-        <span style={{ color: 'var(--nwa-color-text-muted)', fontSize: 20 }}>→</span>
+        <span aria-hidden style={{ color: 'var(--nwa-color-text-muted)', fontSize: 20 }}>→</span>
       </div>
     </Link>
   );
 }
 
-function statusLabel(s: string) {
+function statusMeta(s: string): { label: string; tone: string } {
   switch (s) {
-    case 'invited': return 'Waiting for response';
-    case 'ready_for_review': return 'Ready for review';
-    case 'clarification_needed': return 'Question asked';
-    case 'partially_acknowledged': return 'One person responded';
-    case 'mutually_acknowledged': return 'You both saw this version';
-    case 'in_progress': return 'In progress';
-    case 'unknown': return 'Saved on this device';
-    default: return s;
+    case 'mutually_acknowledged': return { label: 'Agreed ✓', tone: 'success' };
+    case 'in_progress': return { label: 'In progress', tone: 'success' };
+    case 'clarification_needed': return { label: 'Question open', tone: 'warning' };
+    case 'partially_acknowledged': return { label: 'One person replied', tone: '' };
+    case 'ready_for_review': return { label: 'Waiting on them', tone: '' };
+    case 'invited': return { label: 'Invite sent', tone: '' };
+    case 'stalled': return { label: 'Stalled', tone: 'danger' };
+    case 'unknown': return { label: 'Saved on this device', tone: '' };
+    default: return { label: s.replace(/_/g, ' '), tone: '' };
   }
 }

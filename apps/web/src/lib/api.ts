@@ -1,10 +1,27 @@
 /**
  * Thin typed client for the NaWeAgree API.
- * W4: this goes through the Next.js BFF proxy (same-origin) and attaches the
- * session cookie. For W0 we call the worker directly.
+ *
+ * In the browser we talk to the same-origin BFF proxy (/api/proxy/...) so
+ * cookies flow, there are no CORS preflights, and the preview host works
+ * without extra config. Non-GET requests route through the outbox queue
+ * when the browser is offline (see lib/outbox.ts) — they are replayed
+ * automatically on reconnect and stamped with an Idempotency-Key header.
+ *
+ * Server-side calls (Next server components, tests) resolve directly
+ * against the API (no outbox, no BFF).
  */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://127.0.0.1:8787';
+import { smartFetch } from './use-outbox';
+
+function pickBase(): string {
+  if (typeof window === 'undefined') {
+    return process.env.NEXT_PUBLIC_API_URL ?? 'http://127.0.0.1:8787';
+  }
+  return '/api/proxy';
+}
+
+const API_BASE = pickBase();
+const isBrowser = typeof window !== 'undefined';
 
 export interface ApiError {
   code: string;
@@ -21,20 +38,40 @@ export class ApiClientError extends Error {
   }
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    ...init,
-    headers: { 'content-type': 'application/json', ...(init?.headers ?? {}) },
+export class ApiQueuedError extends Error {
+  constructor() { super('Queued to send when you\'re back online.'); this.name = 'ApiQueuedError'; }
+}
+
+async function request<T>(path: string, init: RequestInit & { offlineQueueable?: boolean } = {}): Promise<T> {
+  const { offlineQueueable = true, headers: rawHeaders, body, ...rest } = init;
+  const method = (rest.method ?? 'GET').toUpperCase();
+  const headers: Record<string, string> = { 'content-type': 'application/json', ...(rawHeaders as Record<string, string> | undefined ?? {}) };
+
+  const fetchImpl = isBrowser ? smartFetch : fetch;
+  const res = await fetchImpl(`${API_BASE}${path}`, {
+    ...rest,
+    method,
+    credentials: 'include',
+    headers,
+    body: body as BodyInit | undefined,
     cache: 'no-store',
+    offlineQueueable,
   });
-  const body = await res.json().catch(() => ({}));
+  // 202 from the outbox proxy (currently we don't use it — offline path
+  // throws above — but kept so future server-side 202 Accepted works).
+  if (res.status === 202) {
+    const j = await res.json().catch(() => ({})) as { queued?: boolean };
+    if (j.queued) throw new ApiQueuedError();
+    return j as T;
+  }
+  const bodyJson = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const err = (body as { error?: ApiError }).error
-      ? (body as { error: ApiError })
+    const err = (bodyJson as { error?: ApiError }).error
+      ? (bodyJson as { error: ApiError })
       : { error: { code: 'INTERNAL_ERROR', message: 'Something went wrong.', requestId: 'unknown', retryable: false } };
     throw new ApiClientError(res.status, err);
   }
-  return body as T;
+  return bodyJson as T;
 }
 
 export interface CreatedJob {
@@ -125,5 +162,40 @@ export const api = {
   },
   getVersions(jobId: string): Promise<{ versions: VersionView[] }> {
     return request(`/v1/jobs/${jobId}/versions`);
+  },
+  /** Download the signed JSON receipt (mutual ack only). Returns the parsed envelope. */
+  async getReceipt(jobId: string): Promise<unknown> {
+    const res = await fetch(`${API_BASE}/v1/jobs/${jobId}/receipt`, { credentials: 'include' });
+    if (!res.ok) throw new ApiClientError(res.status, { error: { code: 'RECEIPT_UNAVAILABLE', message: 'Receipt not available yet.', requestId: '', retryable: false } });
+    return res.json();
+  },
+  /** Trigger a plaintext receipt download in the browser. */
+  downloadReceiptTxt(jobId: string) {
+    window.location.href = `${API_BASE}/v1/jobs/${jobId}/receipt.txt`;
+  },
+  /** Download the signed JSON as a file via a temporary anchor. */
+  async downloadReceiptJson(jobId: string, filename?: string) {
+    const data = await this.getReceipt(jobId);
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename ?? `naweagree-${jobId}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  },
+  verifyReceipt(envelope: unknown): Promise<{ ok: boolean; reason?: string; payload?: Record<string, unknown> }> {
+    return request('/v1/receipts/verify', { method: 'POST', body: JSON.stringify(envelope) });
+  },
+  reportAbuse(input: { reason: string; description: string; jobId?: string; token?: string; contact?: string }): Promise<{ id: string; status: string }> {
+    return request('/v1/abuse/report', { method: 'POST', body: JSON.stringify(input) });
+  },
+  requestPrivacy(kind: 'export' | 'delete'): Promise<{ request: { id: string; status: string; kind: string } }> {
+    return request('/v1/privacy/requests', { method: 'POST', body: JSON.stringify({ kind }) });
+  },
+  listPrivacyRequests(): Promise<{ requests: { id: string; kind: string; status: string; createdAt: string }[] }> {
+    return request('/v1/privacy/requests');
   },
 };

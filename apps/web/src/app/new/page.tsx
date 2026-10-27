@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { api, type ApiClientError } from '../../lib/api';
+import { api, ApiClientError, ApiQueuedError } from '../../lib/api';
 
 const CATEGORIES = [
   { key: 'tailor', label: 'Tailor / sewing', emoji: '🧵' },
@@ -35,7 +35,11 @@ export default function NewPlanPage() {
       const result = await api.createJob({ title, categoryKey, creatorName: name || undefined, initialNotes: notes || undefined });
       router.push(`/j/${result.invite.token}/share?title=${encodeURIComponent(title)}&jobId=${encodeURIComponent(result.job.id)}&creatorId=${encodeURIComponent(result.creatorParticipantId)}`);
     } catch (err) {
-      const e = err as ApiClientError;
+      if (err instanceof ApiQueuedError) {
+        setError('Your plan is saved on this device and will be created when you\'re back online. Check "My plans" after reconnecting.');
+        return;
+      }
+      const e = err instanceof ApiClientError ? err : null;
       if (e?.payload?.error?.fields?.length) {
         const fe: Record<string, string> = {};
         for (const f of e.payload.error.fields) fe[f.path] = f.message ?? 'Check this field.';

@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="nwa_primary">#155EEF</color>
-    <color name="nwa_bg">#F5F7FB</color>
+    <color name="nwa_primary">#C2410C</color>
+    <color name="nwa_primary_dark">#9A3412</color>
+    <color name="nwa_teal">#0F766E</color>
+    <color name="nwa_gold">#B7791F</color>
+    <color name="nwa_bg">#FBF7F2</color>
+    <color name="nwa_surface">#FFFFFF</color>
+    <color name="nwa_ink">#1C140D</color>
+    <color name="nwa_muted">#6B5C4F</color>
+    <color name="nwa_border">#E7DCCC</color>
+    <color name="nwa_danger">#B91C1C</color>
 </resources>

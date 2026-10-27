@@ -17,6 +17,7 @@ export function Footer() {
             <li><Link href="/new">Start a plan</Link></li>
             <li><Link href="/plans">My plans</Link></li>
             <li><Link href="/how">How it works</Link></li>
+            <li><Link href="/r/verify">Verify a receipt</Link></li>
             <li><Link href="/offline">Offline</Link></li>
           </ul>
         </div>
@@ -29,11 +30,13 @@ export function Footer() {
           </ul>
         </div>
         <div>
-          <h4>Fine print</h4>
+          <h4>Trust & legal</h4>
           <ul>
             <li><Link href="/privacy">Privacy</Link></li>
+            <li><Link href="/privacy/requests">Your data (NDPR)</Link></li>
             <li><Link href="/terms">Terms</Link></li>
             <li><Link href="/safety">Safety & trust</Link></li>
+            <li><Link href="/safety/report">Report abuse</Link></li>
           </ul>
         </div>
       </div>
