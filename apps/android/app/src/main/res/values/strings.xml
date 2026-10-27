@@ -1,5 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NaWeAgree</string>
-    <string name="prototype_warning">Prototype — not yet a contract, not yet for real jobs.</string>
+    <string name="prototype_warning">Prototype — this is a shared record, not a legal contract.</string>
+
+    <!-- Nav -->
+    <string name="nav_plans">My plans</string>
+    <string name="nav_new">Start plan</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Home / list -->
+    <string name="home_empty_title">No plans yet</string>
+    <string name="home_empty_body">Start your first plan — share a link, and both of you confirm what you agreed.</string>
+    <string name="home_cta_start">Start a plan</string>
+    <string name="home_offline_banner">You\'re offline. New responses will send when you\'re back.</string>
+
+    <!-- Plan detail -->
+    <string name="plan_status_invited">Waiting for them to open the link</string>
+    <string name="plan_status_review">Waiting on their review</string>
+    <string name="plan_status_partial">One person hasn\'t reviewed yet</string>
+    <string name="plan_status_mutual">You both agreed ✓</string>
+    <string name="plan_status_clarification">A question is open</string>
+    <string name="plan_status_stalled">No reply for a week — nudge them?</string>
+    <string name="plan_cta_agree">I have seen and I agree</string>
+    <string name="plan_cta_question">Ask a question</string>
+    <string name="plan_cta_need_time">I need more time</string>
+    <string name="plan_cta_disagree">I see it differently</string>
+    <string name="plan_cta_receipt">Download signed receipt</string>
+    <string name="plan_cta_reset">Reset invite link</string>
+    <string name="plan_cta_share">Share plan</string>
+    <string name="plan_invited_title">%1$s invited you</string>
+
+    <!-- Abuse / safety -->
+    <string name="report_title">Report something wrong</string>
+    <string name="report_submit">Send report</string>
+    <string name="report_reason_label">What\'s wrong?</string>
+    <string name="report_description_hint">What happened?</string>
+
+    <!-- Receipt verify -->
+    <string name="verify_title">Verify a receipt</string>
+    <string name="verify_hint">Paste the receipt JSON to check its signature.</string>
+    <string name="verify_ok">Signature matches — genuine NaWeAgree record.</string>
+    <string name="verify_bad">This doesn\'t look like one of our receipts.</string>
+
+    <!-- Privacy / NDPR -->
+    <string name="privacy_title">Your data</string>
+    <string name="privacy_export">Download my data</string>
+    <string name="privacy_delete">Delete my data</string>
+    <string name="privacy_body">NDPR gives you rights over data we hold about you. Buttons here talk to the API directly — no email required.</string>
+
+    <!-- Offline -->
+    <string name="offline_title">You\'re offline</string>
+    <string name="offline_body">You can still read plans you opened before. Responses are queued and send when you\'re back.</string>
+
+    <!-- Errors -->
+    <string name="error_generic">Something went wrong. We logged it. Try again.</string>
+    <string name="error_not_found">We couldn\'t find that plan — the link may have been reset.</string>
+    <string name="error_conflict">Someone posted a new version while you were typing. We\'ve loaded the latest.</string>
 </resources>

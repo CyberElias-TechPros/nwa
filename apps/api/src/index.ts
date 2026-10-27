@@ -10,6 +10,9 @@ import { repositoryMiddleware, type Env } from './db/factory.js';
 import { healthRoutes } from './routes/health.js';
 import { jobsRoutes, inviteRoutes } from './modules/jobs/routes.js';
 import { schedulerRoutes } from './modules/scheduler/routes.js';
+import { jobReceiptRoutes, receiptVerifyRoutes } from './modules/receipts/routes.js';
+import { abuseRoutes } from './modules/abuse/routes.js';
+import { privacyRoutes } from './modules/privacy/routes.js';
 
 /**
  * NaWeAgree API entry point (Hono on Cloudflare Workers).
@@ -58,8 +61,11 @@ app.use(
 
 app.route('/v1', healthRoutes);
 app.route('/v1/jobs', jobsRoutes);
-// Invite preview endpoint lives at top-level (public, no auth).
+app.route('/v1/jobs', jobReceiptRoutes);   // /v1/jobs/:id/receipt(.txt)
 app.route('/v1/invites', inviteRoutes);
+app.route('/v1/abuse', abuseRoutes);       // /v1/abuse/report
+app.route('/v1/privacy', privacyRoutes);   // /v1/privacy/requests...
+app.route('/v1/receipts', receiptVerifyRoutes); // /v1/receipts/verify
 // Internal scheduler routes (cron-invoked, SCHEDULER_SECRET-gated).
 app.route('/_scheduler', schedulerRoutes);
 

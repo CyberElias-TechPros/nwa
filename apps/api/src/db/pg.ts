@@ -285,6 +285,7 @@ export function createPgRepository(databaseUrl: string): JobRepository & { db: K
   // ------------------- API methods -------------------
 
   const repo: JobRepository & { db: Kysely<Database>; pool: Pool } = {
+    backend: 'postgres' as const,
     db,
     pool,
 
@@ -803,6 +804,29 @@ export function createPgRepository(databaseUrl: string): JobRepository & { db: K
         const refreshed = (await trx.selectFrom('jobs').selectAll().where('id', '=', jobId).executeTakeFirst())!;
         return (await hydrateJob(trx, refreshed)).job;
       });
+    },
+
+    async recordAbuseReport() {
+      // TODO: W9 — requires abuse_reports table migration.
+      throw new Error('Abuse reports require Postgres schema migration (W9).');
+    },
+    async listAbuseReports() {
+      throw new Error('Abuse reports require Postgres schema migration (W9).');
+    },
+    async createPrivacyRequest() {
+      throw new Error('Privacy requests require Postgres schema migration (W9).');
+    },
+    async listPrivacyRequests() {
+      throw new Error('Privacy requests require Postgres schema migration (W9).');
+    },
+    async listAllPrivacyRequests() {
+      throw new Error('Privacy requests require Postgres schema migration (W9).');
+    },
+    async processPrivacyExport() {
+      throw new Error('Privacy requests require Postgres schema migration (W9).');
+    },
+    async processPrivacyDelete() {
+      throw new Error('Privacy requests require Postgres schema migration (W9).');
     },
 
     async __reset() {

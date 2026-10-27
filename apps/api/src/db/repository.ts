@@ -97,6 +97,8 @@ export interface NewVersionInput {
 }
 
 export interface JobRepository {
+  /** Backend tag for health/readiness reports ('memory' | 'postgres'). */
+  readonly backend: 'memory' | 'postgres';
   createJob(input: CreateJobInput): Promise<{ job: JobAggregate; invite: Invite; creatorId: ParticipantId }>;
   getJob(id: JobId): Promise<JobRow | null>;
   resolveInvite(token: string): Promise<{ row: JobRow; invite: Invite } | { error: 'expired' | 'revoked' | 'missing' }>;
@@ -123,8 +125,57 @@ export interface JobRepository {
   listStaleJobs(olderThanMs: number, limit: number): Promise<JobRow[]>;
   /** Transition a job into the `stalled` status and emit an audit event. */
   markStalled(jobId: JobId): Promise<JobAggregate | null>;
+  /** Record an abuse report. Returns the new report id. */
+  recordAbuseReport(input: AbuseReportInput): Promise<string>;
+  /** List all abuse reports (admin). */
+  listAbuseReports(): Promise<AbuseReport[]>;
+  /** GDPR/NDPR: create an export or deletion request for this device. */
+  createPrivacyRequest(input: PrivacyRequestInput): Promise<PrivacyRequest>;
+  /** GDPR/NDPR: return all requests for this device. */
+  listPrivacyRequests(deviceKey: string): Promise<PrivacyRequest[]>;
+  /** Admin: list all privacy requests. */
+  listAllPrivacyRequests(): Promise<PrivacyRequest[]>;
+  /** Process the export (collect all data tied to deviceKey) and mark ready. */
+  processPrivacyExport(id: string): Promise<PrivacyRequest | null>;
+  /** Process the deletion (anonymise all data tied to deviceKey). */
+  processPrivacyDelete(id: string): Promise<PrivacyRequest | null>;
   /** Test helper; in Postgres impl it TRUNCATEs within a test transaction. */
   __reset(): Promise<void>;
+}
+
+export interface AbuseReportInput {
+  reason: 'harassment' | 'scam' | 'impersonation' | 'under_age' | 'violence' | 'other';
+  jobId?: string;
+  token?: string;
+  description: string;
+  contact?: string;
+  reporterDeviceKey: string | null;
+}
+
+export interface AbuseReport {
+  id: string;
+  reason: AbuseReportInput['reason'];
+  jobId?: string;
+  token?: string;
+  description: string;
+  contact?: string;
+  reporterDeviceKey: string | null;
+  createdAt: string;
+  status: 'new' | 'reviewing' | 'resolved' | 'dismissed';
+}
+
+export interface PrivacyRequestInput {
+  kind: 'export' | 'delete';
+  deviceKey: string;
+}
+
+export interface PrivacyRequest {
+  id: string;
+  kind: 'export' | 'delete';
+  deviceKey: string;
+  createdAt: string;
+  status: 'pending' | 'ready' | 'completed' | 'rejected';
+  payload?: unknown;
 }
 
 /** Adapter: convert stored fields (e.g. BriefField[]) into a JobVersion. */

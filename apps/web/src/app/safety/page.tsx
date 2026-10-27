@@ -30,7 +30,11 @@ export default function SafetyPage() {
 
       <div className="card">
         <h3>Harassment & abuse</h3>
-        <p>If you receive a plan that is threatening, harassing, or spam, please forward the link to <a href="mailto:safety@naweagree.app">safety@naweagree.app</a>. We will revoke it and ban the creator. We respond to every safety report within 24 hours during beta.</p>
+        <p style={{ marginBottom: 12 }}>If you receive a plan that is threatening, harassing, or spam, tell us. A human reads every report. We will revoke the link and ban repeat bad actors. We respond within 24 hours during beta.</p>
+        <p style={{ margin: 0 }}>
+          <Link href="/safety/report" className="btn danger">Report a problem</Link>
+          {' '}<a href="mailto:safety@naweagree.app" className="btn ghost">Email safety@naweagree.app</a>
+        </p>
       </div>
 
       <div className="card">

@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { api, type ApiClientError, type InvitePreview } from '@/lib/api';
+import { api, ApiClientError, ApiQueuedError, type InvitePreview } from '@/lib/api';
+
+function errMessage(e: unknown, fallback = 'Try again.'): string {
+  if (e instanceof ApiQueuedError) return 'Saved on this device — will send when you\'re back online.';
+  if (e instanceof ApiClientError) return e.payload?.error?.message ?? fallback;
+  return fallback;
+}
 import { VersionHistory } from './version-history';
 import { ProposeVersion } from './propose-version';
 
@@ -39,16 +45,29 @@ export function CreatorView({ token, initial, creatorId }: Props) {
       await api.ackInvite(token, creatorId, 'reviewed');
       router.refresh();
     } catch (err) {
-      setError(((err as ApiClientError).payload?.error?.message) ?? 'Try again.');
+      setError(errMessage(err));
     } finally { setBusy(false); }
   }
 
   return (
     <div>
-      <section className="card" style={{ background: '#f0f9ff', border: '1px solid #bfdbfe' }}>
+      <section className={`card ${initial.job.status === 'mutually_acknowledged' ? 'success' : initial.job.status === 'stalled' ? 'warning' : initial.job.status === 'clarification_needed' ? 'warning' : ''}`}>
         <p className="muted" style={{ margin: 0, fontSize: 13 }}>You started this plan</p>
         <h2 style={{ margin: '4px 0 8px' }}>{statusHeadline(initial.job.status, responded.length, active.length)}</h2>
         <CreatorStatusBar initial={initial} />
+        {initial.job.status === 'mutually_acknowledged' && (
+          <div style={{ marginTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <button className="btn teal" onClick={() => api.downloadReceiptJson(initial.job.id, `naweagree-${initial.job.id}-v${initial.currentVersion.number}.json`)}>
+              Download signed receipt (JSON)
+            </button>
+            <button className="btn ghost" onClick={() => api.downloadReceiptTxt(initial.job.id)}>
+              Text version
+            </button>
+          </div>
+        )}
+        {initial.job.status === 'stalled' && (
+          <p className="muted" style={{ margin: '8px 0 0' }}>No reply for a week. Try nudging through your usual chat app, or propose an updated version above.</p>
+        )}
       </section>
 
       {error && <div role="alert" style={{ color: '#b91c1c', marginBottom: 12 }}>{error}</div>}
@@ -106,7 +125,7 @@ export function CreatorView({ token, initial, creatorId }: Props) {
               alert(`New link ready (copied to clipboard). Old link is now disabled.`);
               router.refresh();
             } catch (err) {
-              setError(((err as ApiClientError).payload?.error?.message) ?? 'Could not reset link — try again.');
+              setError(errMessage(err, 'Could not reset link — try again.'));
             } finally {
               setBusy(false);
             }

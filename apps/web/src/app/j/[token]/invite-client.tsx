@@ -2,10 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { api, type ApiClientError, type InvitePreview } from '@/lib/api';
+import { api, ApiClientError, ApiQueuedError, type InvitePreview } from '@/lib/api';
 import { getClaimedParticipation, rememberClaimedInvite } from '@/lib/storage';
 import { VersionHistory } from './version-history';
 import { ProposeVersion } from './propose-version';
+
+function errMessage(e: unknown, fallback = 'Try again.'): string {
+  if (e instanceof ApiQueuedError) return 'Saved on this device — will send when you\'re back online.';
+  if (e instanceof ApiClientError) return e.payload?.error?.message ?? fallback;
+  return fallback;
+}
 
 export function InviteClient({ token, initial }: { token: string; initial: InvitePreview }) {
   const router = useRouter();
@@ -74,7 +80,7 @@ export function InviteClient({ token, initial }: { token: string; initial: Invit
       });
       router.refresh();
     } catch (err) {
-      setError(((err as ApiClientError).payload?.error?.message) ?? 'Try again.');
+      setError(errMessage(err));
     } finally {
       setBusy(null);
     }
@@ -93,7 +99,7 @@ export function InviteClient({ token, initial }: { token: string; initial: Invit
       await api.ackInvite(token, claimedId, action, comment || undefined);
       router.refresh();
     } catch (err) {
-      setError(((err as ApiClientError).payload?.error?.message) ?? 'Try again.');
+      setError(errMessage(err));
     } finally {
       setBusy(null);
     }
@@ -111,7 +117,7 @@ export function InviteClient({ token, initial }: { token: string; initial: Invit
       setComment('');
       router.refresh();
     } catch (err) {
-      setError(((err as ApiClientError).payload?.error?.message) ?? 'Try again.');
+      setError(errMessage(err));
     } finally {
       setBusy(null);
     }
@@ -144,6 +150,15 @@ export function InviteClient({ token, initial }: { token: string; initial: Invit
     <div>
       {error && <div role="alert" className="card" style={{ background: '#fef2f2', borderColor: '#fecaca', color: '#b91c1c' }}>{error}</div>}
 
+      {initial.job.status === 'stalled' && (
+        <div className="card warning" role="status">
+          <strong>No reply for a week.</strong> Try sharing the link again, or nudge them through your usual chat app. If the other person isn't responding, you can also withdraw the plan.
+        </div>
+      )}
+      {(initial.job.status === 'invited' || initial.job.status === 'ready_for_review' || initial.job.status === 'partially_acknowledged') && (
+        <p className="muted" style={{ fontSize: 13 }}>Reminders go out automatically 48 hours after the last update. If a week passes without a reply, the plan is marked <em>stalled</em>.</p>
+      )}
+
       {showChange && (
         <div className="card">
           <h3 style={{ marginTop: 0 }}>{showChange === 'question' ? 'Ask a question' : 'What needs to change?'}</h3>
@@ -168,9 +183,22 @@ export function InviteClient({ token, initial }: { token: string; initial: Invit
       )}
 
       {alreadyMutual && (
-        <div className="card" style={{ background: '#ecfdf5', border: '1px solid #6ee7b7' }}>
-          <strong>You both saw this version.</strong> If something changes, either side can propose an update and the review starts again. Version updates are wired in W6.
-        </div>
+        <>
+          <div className="card success">
+            <strong style={{ display: 'block', marginBottom: 6 }}>✓ You both reviewed this version.</strong>
+            <p className="muted" style={{ margin: 0 }}>
+              Save a signed receipt for your records. It's a tamper-evident record of exactly what you agreed and when — not a legal contract, but a shared memory.
+            </p>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
+              <button className="btn teal" onClick={() => api.downloadReceiptJson(initial.job.id, `naweagree-${initial.job.id}-v${initial.currentVersion.number}.json`)}>
+                Download signed receipt (JSON)
+              </button>
+              <button className="btn ghost" onClick={() => api.downloadReceiptTxt(initial.job.id)}>
+                Text version
+              </button>
+            </div>
+          </div>
+        </>
       )}
 
       {!alreadyMutual && !showChange && (

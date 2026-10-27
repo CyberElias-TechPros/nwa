@@ -2,7 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { api, type ApiClientError, type InvitePreview } from '@/lib/api';
+import { api, ApiClientError, ApiQueuedError, type InvitePreview } from '@/lib/api';
+
+function errMessage(e: unknown, fallback = 'Try again.'): string {
+  if (e instanceof ApiQueuedError) return 'Saved on this device — will send when you\'re back online.';
+  if (e instanceof ApiClientError) return e.payload?.error?.message ?? fallback;
+  return fallback;
+}
 
 interface Props {
   token: string;
@@ -55,13 +61,11 @@ export function ProposeVersion({ initial, participantId }: Props) {
       setReason('');
       router.refresh();
     } catch (err) {
-      const e = err as ApiClientError;
-      const code = e.payload?.error?.code;
-      if (code === 'VERSION_CONFLICT') {
+      if (err instanceof ApiClientError && err.payload?.error?.code === 'VERSION_CONFLICT') {
         setError('Someone posted a new version while you were editing. We refreshed the page — review the latest version and try again.');
         setTimeout(() => router.refresh(), 800);
       } else {
-        setError(e.payload?.error?.message ?? 'Try again.');
+        setError(errMessage(err));
       }
     } finally {
       setBusy(false);

@@ -34,6 +34,8 @@ import {
   __resetStore,
 } from '../modules/jobs/store.js';
 import type {
+  AbuseReport,
+  AbuseReportInput,
   AddChangeInput,
   AcknowledgeInput,
   AuthzInput,
@@ -44,6 +46,8 @@ import type {
   JobRepository,
   JobRow,
   NewVersionInput,
+  PrivacyRequest,
+  PrivacyRequestInput,
 } from './repository.js';
 
 export function createMemoryRepository(): JobRepository {
@@ -52,6 +56,8 @@ export function createMemoryRepository(): JobRepository {
   const bindings = new Map<ParticipantId, string>();
   // Revoked tokens we keep around to give a distinct error.
   const revokedTokens = new Set<string>();
+  const abuseReports: AbuseReport[] = [];
+  const privacyRequests: PrivacyRequest[] = [];
 
   function bind(pid: ParticipantId, dk: string | undefined) {
     if (dk) bindings.set(pid, dk);
@@ -70,7 +76,9 @@ export function createMemoryRepository(): JobRepository {
     }
   }
 
-  return {
+  const repo: JobRepository = {
+    backend: 'memory',
+
     async createJob(input: CreateJobInput) {
       const out = memCreate(input);
       bind(out.creatorId, input.deviceKey);
@@ -239,12 +247,74 @@ export function createMemoryRepository(): JobRepository {
       return row.job;
     },
 
+    // --- Abuse reports --------------------------------------------------
+    async recordAbuseReport(input: AbuseReportInput) {
+      const id = publicId('abuse');
+      abuseReports.push({
+        id, reason: input.reason, jobId: input.jobId, token: input.token,
+        description: input.description, contact: input.contact,
+        reporterDeviceKey: input.reporterDeviceKey, createdAt: nowIso(), status: 'new',
+      });
+      return id;
+    },
+    async listAbuseReports() {
+      return [...abuseReports].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    },
+
+    // --- Privacy (GDPR / NDPR) -----------------------------------------
+    async createPrivacyRequest(input: PrivacyRequestInput) {
+      const id = publicId('priv');
+      const req: PrivacyRequest = {
+        id, kind: input.kind, deviceKey: input.deviceKey,
+        createdAt: nowIso(), status: 'pending',
+      };
+      privacyRequests.push(req);
+      return req;
+    },
+    async listPrivacyRequests(deviceKey: string) {
+      return privacyRequests.filter((p) => p.deviceKey === deviceKey)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    },
+    async listAllPrivacyRequests() {
+      return [...privacyRequests].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    },
+    async processPrivacyExport(id: string) {
+      const req = privacyRequests.find((p) => p.id === id);
+      if (!req) return null;
+      const jobs = (await this.listJobsForDevice(req.deviceKey))
+        .map((j) => ({ id: j.id, title: j.title, status: j.status, updatedAt: j.updatedAt }));
+      req.payload = { jobs, exportedAt: nowIso() };
+      req.status = 'ready';
+      return req;
+    },
+    async processPrivacyDelete(id: string) {
+      const req = privacyRequests.find((p) => p.id === id);
+      if (!req) return null;
+      // Anonymise names on all jobs where this device was a participant, and
+      // revoke any bound device keys. This is a light touch; in production we
+      // would cascade-delete or hard-anonymise per NDPR Art. 34.
+      for (const row of listAllJobRows()) {
+        for (const p of row.job.participants) {
+          if ((p as Participant & { deviceKey?: string | null }).deviceKey === req.deviceKey) {
+            (p as { displayName: string }).displayName = 'Deleted user';
+            bindings.delete(p.id);
+          }
+        }
+      }
+      req.status = 'completed';
+      req.payload = { deletedAt: nowIso() };
+      return req;
+    },
+
     async __reset(): Promise<void> {
       bindings.clear();
       revokedTokens.clear();
+      abuseReports.length = 0;
+      privacyRequests.length = 0;
       __resetStore();
     },
   };
+  return repo;
 }
 
 /** Re-exports for convenience of tests and the future Postgres impl. */
