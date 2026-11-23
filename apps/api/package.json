@@ -14,11 +14,11 @@
     "db:reset": "node --experimental-strip-types -e \"import('./db/migrate.js').then(async m=>{const {Pool}=require('@neondatabase/serverless');const p=new Pool({connectionString:process.env.DATABASE_URL});await p.query('DROP SCHEMA public CASCADE; CREATE SCHEMA public;');await p.end();}).catch(e=>{console.error(e);process.exit(1)})\""
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.2.0",
+    "@neondatabase/serverless": "^1.2.1",
     "@nwa/contracts": "workspace:*",
     "@nwa/domain": "workspace:*",
-    "hono": "^4.6.8",
-    "kysely": "^0.29.7",
+    "hono": "^4.13.19",
+    "kysely": "^0.29.9",
     "zod": "^3.23.8"
   },
   "devDependencies": {
